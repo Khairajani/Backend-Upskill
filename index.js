@@ -1,179 +1,117 @@
 const express = require('express');
 const { resolve } = require('path');
+const cors = require("cors");
+const { DefaultSerializer } = require('v8');
 
 const app = express();
+app.use(cors())
 const port = 3000;
 
-// ======================= Tutorial: BD1.1 =======================
+
+// ======================= Endpoints Below =======================
 // start node app: node index.js
-// base GET code
+
+function getHomeMessage() {
+  return 'This is Home Page of FlipDeal.';
+}
+
 app.get('/', (req, res) => {
   res.send(getHomeMessage());
 });
 
-// /shoutname?name=Himanshu
-app.get('/shoutname', (req, res) => {
-  let name = req.query.name;
-  let nameUpperCase = name.toUpperCase();
+function getCartTotalPrice(cartTotal,newItemPrice=0,discount=0,isMember='false'){
+  let membership = isMember=='true';
+  let newCartTotal = cartTotal + newItemPrice;
+  let discountednewCartPrice;
 
-  res.send(nameUpperCase);
+  if (membership){
+    discountednewCartPrice = newCartTotal - (newCartTotal*(discount/100));
+  } else {
+    discountednewCartPrice = newCartTotal 
+  }
+  return discountednewCartPrice;
+}
+
+// /cart-total?cartTotal=1000&newItemPrice=0
+app.get('/cart-total', (req, res) => {
+
+  let newItemPrice = parseFloat(req.query.newItemPrice);
+  let cartTotal = parseFloat(req.query.cartTotal);
+  let totalCartPrice = getCartTotalPrice(cartTotal, newItemPrice, 0, "false").toString()
+
+  res.send(totalCartPrice);
 });
 
-// /shoutfullname?first=Himanshu&last=Khairajani
-app.get('/shoutfullname', (req, res) => {
-  let first = req.query.first;
-  let last = req.query.last;
-  let nameUpperCase = first + ' ' + last;
+// /membership-discount?cartTotal=1000&isMember=true
+app.get('/membership-discount', (req, res) => {
 
-  res.send(nameUpperCase);
+  let cartTotal = parseFloat(req.query.cartTotal);
+  let isMember = req.query.isMember;
+  let totalCartPrice = getCartTotalPrice(cartTotal, 0, 10, isMember).toString()
+
+  res.send(totalCartPrice);
 });
 
-// /date?month=Sept&year=1999
-app.get('/date', (req, res) => {
-  let month = req.query.month;
-  let year = req.query.year;
-  let formattedDate = month + ', ' + year;
+function getcartTotalTax(cartTotal, tax=5){
+  let cartTotalTax = (cartTotal*(tax/100));
+  return cartTotalTax;
+}
+// /calculate-tax?cartTotal=1000
+app.get('/calculate-tax', (req, res) => {
 
-  res.send(formattedDate);
+  let cartTotal = parseFloat(req.query.cartTotal);
+  let cartTotalTax = getcartTotalTax(cartTotal).toString()
+
+  res.send(cartTotalTax);
 });
 
-// /greet?name=Himanshu
-app.get('/greet', (req, res) => {
-  let name = req.query.name;
-  let greetingMessage = 'Namaste, ' + name + '!';
+function getDeliveryTime(distance,shippingMethod){
 
-  res.send(greetingMessage);
-});
+  let deliveryTime;
 
-// /address?street=34+Samriddhi+Vihar&city=Raipur&state=CG
-app.get('/address', (req, res) => {
-  let street = req.query.street;
-  let city = req.query.city;
-  let state = req.query.state;
-  let completeAddress = street + ', ' + city + ', ' + state;
+  if (shippingMethod.toLowerCase()=="standard"){
+    deliveryTime = Math.round(distance/50);
+  } else {
+    deliveryTime = Math.round(distance/100);
+  }
+  return deliveryTime;
+}
 
-  res.send(completeAddress);
-});
+// /estimate-delivery?shippingMethod=express&distance=600
+app.get('/estimate-delivery', (req, res) => {
 
-// /email?username=himanshukhairajani8&domain=gmail.com
-app.get('/email', (req, res) => {
-  let username = req.query.username;
-  let domain = req.query.domain;
-  let email = username + '@' + domain;
-
-  res.send(email);
-});
-
-// ======================= Tutorial: BD1.2 =======================
-// /total-distance?distance1=100&distance2=08
-app.get('/total-distance', (req, res) => {
-  let distance1 = parseFloat(req.query.distance1);
-  let distance2 = parseFloat(req.query.distance2);
-  let totalDistance = distance1 + distance2;
-
-  res.send(totalDistance.toString());
-});
-
-// /total-time?time1=100&time2=08&time3=08
-app.get('/total-time', (req, res) => {
-  let time1 = parseFloat(req.query.time1);
-  let time2 = parseFloat(req.query.time2);
-  let time3 = parseFloat(req.query.time3);
-  let totalTime = time1 + time2 + time3;
-
-  res.send(totalTime.toString());
-});
-
-// /total-speed?distance=100&time=08
-app.get('/total-speed', (req, res) => {
   let distance = parseFloat(req.query.distance);
-  let time = parseFloat(req.query.time);
-  let totalSpeed = distance / time;
+  let shippingMethod = req.query.shippingMethod;
+  let deliveryTime = getDeliveryTime(distance, shippingMethod).toString()
 
-  res.send(totalSpeed.toString());
+  res.send(deliveryTime);
 });
 
-// /total-cal?duration1=100&duration2=100&calPerMin=2
-app.get('/total-cal', (req, res) => {
-  let duration1 = parseFloat(req.query.duration1);
-  let duration2 = parseFloat(req.query.duration2);
-  let calPerMin = parseFloat(req.query.calPerMin);
-  let totalCal = (duration1 + duration2) * calPerMin;
-
-  res.send(totalCal.toString());
-});
-
-// /interest?principal=1000&rate=5&time=2
-app.get('/interest', (req, res) => {
-  let principal = parseFloat(req.query.principal);
-  let rate = parseFloat(req.query.rate);
-  let time = parseFloat(req.query.time);
-  let interest = (principal * time * rate) / 100;
-
-  res.send(interest.toString());
-});
-
-// ======================= Tutorial: BD1.3 =======================
-// /check-number?number=2
-app.get('/check-number', (req, res) => {
-  let number = parseFloat(req.query.number);
-  let result;
-  if (number > 0) {
-    result = 'Positive';
-  } else if (number == 0) {
-    result = 'Zero';
-  } else {
-    result = 'Negative';
-  }
-  result = 'Number is ' + result;
-
-  res.send(result);
-});
-
-// /check-odd-even?number=3
-app.get('/check-odd-even', (req, res) => {
-  let number = parseFloat(req.query.number);
-  let result;
-  if (number % 2 == 0) {
-    result = 'Even';
-  } else {
-    result = 'Odd';
-  }
-  result = 'Number is ' + result;
-
-  res.send(result);
-});
-
-// /check-login?isLoggedIn=true
-app.get('/check-login', (req, res) => {
-  let is_user_logged_in = req.query.isLoggedIn == 'true';
-  let result;
-  if (is_user_logged_in) {
-    result = 'User is logged in';
-  } else {
-    result = 'User is not logged in';
-  }
-
-  res.send(result);
-});
-
-// ======================= Tutorial: BD1.4 =======================
-// function for home page (round implemented in beginning)
-function getHomeMessage() {
-  return 'This is Home Page.';
+function getShippingCose(distance,weight){
+  return weight * distance * 0.1;
 }
 
-function checkPassword(password) {
-  if (password.length < 15) {
-    return 'Weak password';
-  } else {
-    return 'Strong password';
-  }
+// /shipping-cost?weight=20&distance=600
+app.get('/shipping-cost', (req, res) => {
+
+  let distance = parseFloat(req.query.distance);
+  let weight = parseFloat(req.query.weight);
+  let shippingCose = getShippingCose(distance, weight).toString()
+
+  res.send(shippingCose);
+});
+
+function getLoyaltyPoints(purchaseAmount){
+  return purchaseAmount*2;
 }
 
-// /check-password?password=himanshu
-app.get('/check-password', (req, res) => {
-  res.send(checkPassword(req.query.password));
+// /loyalty-points?purchaseAmount=3600
+app.get('/loyalty-points', (req, res) => {
+
+  let purchaseAmount = parseFloat(req.query.purchaseAmount);
+  let loyaltyPoints = getLoyaltyPoints(purchaseAmount).toString()
+
+  res.send(loyaltyPoints);
 });
 
 app.listen(port, () => {
