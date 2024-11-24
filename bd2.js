@@ -231,7 +231,7 @@ function sortObject(object1, object2, attribute, type) {
 
 function sortHotelObject(attribute, sort_type) {
   let type = 'desc';
-  if (sort_type == 'low-to-high' || sort_type == 'least-to-most') {
+  if (sort_type=='low-to-high' || sort_type=='least-to-most') {
     type = 'asc';
   }
   let hotelsSorted = hotels.slice();
