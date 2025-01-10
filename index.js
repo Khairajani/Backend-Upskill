@@ -3,122 +3,179 @@ const { resolve } = require('path');
 const cors = require('cors');
 const { DefaultSerializer } = require('v8');
 
-const app = express();
+let app = express();
+let PORT = process.env.PORT || 3000;
 app.use(cors());
-const port = 3000;
+app.use(express.json());
 
-// ======================= Endpoints Below =======================
-// start node app: node index.js
-
-function getHomeMessage() {
-  return 'This is Home Page of AirFlow.';
-}
+app.listen(PORT, () => {
+  console.log('Listening at 3000');
+});
 
 app.get('/', (req, res) => {
-  res.send(getHomeMessage());
+  res.status(200).send('Backend Fundamentals 5 - Assignment');
 });
 
-let tasks = [
-  { taskId: 1, text: 'Fix bug #101', priority: 2 },
-  { taskId: 2, text: 'Implement feature #202', priority: 1 },
-  { taskId: 3, text: 'Write documentation', priority: 3 },
+// ======================= BD5 : HW_2 =======================
+
+const instagramUsers = [
+  {
+    id: 1,
+    username: 'wanderlust_dreamer',
+    followers: 12000,
+    bio: 'Exploring the world one adventure at a time 🌍✈️',
+    profilePicture: 'https://example.com/profile1.jpg',
+    accountType: 'travel',
+  },
+  {
+    id: 2,
+    username: 'foodie_heaven',
+    followers: 8500,
+    bio: 'Tasting the world, one bite at a time 🍔🍕',
+    profilePicture: 'https://example.com/profile2.jpg',
+    accountType: 'food',
+  },
+  {
+    id: 3,
+    username: 'fitness_freak_99',
+    followers: 15000,
+    bio: 'Living a healthy life and lifting heavy 🏋️‍♂️💪',
+    profilePicture: 'https://example.com/profile3.jpg',
+    accountType: 'fitness',
+  },
+  {
+    id: 4,
+    username: 'tech_guru',
+    followers: 20000,
+    bio: 'Tech reviews, tips, and tricks 💻📱',
+    profilePicture: 'https://example.com/profile4.jpg',
+    accountType: 'technology',
+  },
+  {
+    id: 5,
+    username: 'artistic_vibes',
+    followers: 5000,
+    bio: 'Painting the world with colors and creativity 🎨🖌️',
+    profilePicture: 'https://example.com/profile5.jpg',
+    accountType: 'art',
+  },
+  {
+    id: 6,
+    username: 'nature_lovers',
+    followers: 17000,
+    bio: 'Celebrating the beauty of nature 🌿🌄',
+    profilePicture: 'https://example.com/profile6.jpg',
+    accountType: 'nature',
+  },
+  {
+    id: 7,
+    username: 'fashionista101',
+    followers: 25000,
+    bio: 'Your daily dose of style and fashion trends 👗👠',
+    profilePicture: 'https://example.com/profile7.jpg',
+    accountType: 'fashion',
+  },
+  {
+    id: 8,
+    username: 'movie_buff',
+    followers: 11000,
+    bio: 'Reviews and thoughts on all things cinema 🎥🍿',
+    profilePicture: 'https://example.com/profile8.jpg',
+    accountType: 'entertainment',
+  },
+  {
+    id: 9,
+    username: 'gaming_legends',
+    followers: 30000,
+    bio: 'Streaming games and sharing tips 🎮🔥',
+    profilePicture: 'https://example.com/profile9.jpg',
+    accountType: 'gaming',
+  },
+  {
+    id: 10,
+    username: 'bookworm_corner',
+    followers: 7000,
+    bio: 'Books, reviews, and more 📚✨',
+    profilePicture: 'https://example.com/profile10.jpg',
+    accountType: 'books',
+  },
 ];
 
-function taskAdd(taskLlist, object) {
-  taskLlist.push(object);
-  return taskLlist;
-}
+console.log(instagramUsers);
 
-function createTaskObject(taskId, text, priority) {
-  return { taskId: taskId, text: text, priority: priority };
-}
+// GET all users --> /users
+app.get('/users', (req, res) => {
+  res.status(200).json({ users: instagramUsers });
 
-// /tasks/add?taskId=34&text=this+is+my+house+number&priority=0
-app.get('/tasks/add', (req, res) => {
-  let taskId = parseInt(req.query.taskId);
-  let text = req.query.text;
-  let priority = parseInt(req.query.priority);
-  let newObject = createTaskObject(taskId, text, priority);
-  let newTaskList = taskAdd(tasks.slice(), newObject);
-  res.json({ tasks: newTaskList });
+  // Cutshort for Brainy Reasons
+  // res.status(200).json({ message: `<List of Instagram Users>` });
 });
 
-function createTaskObject(taskId, text, priority) {
-  return { taskId: taskId, text: text, priority: priority };
-}
-// /tasks
-app.get('/tasks', (req, res) => {
-  res.json({ tasks: tasks });
+// GET user details by id --> /users/1
+app.get('/users/:id', (req, res) => {
+  let id = parseInt(req.params.id);
+  const user = instagramUsers.find((user) => user.id === id);
+  if (user === undefined) {
+    res.status(404).send('not found');
+  } else {
+    res.status(200).json({ details: user });
+  }
+
+  // Cutshort for Brainy Reasons
+  // res.status(200).json({ message: `Details for User ID:  ${id}`
 });
 
-function sortTasks(attribute, task1, task2) {
-  return task1[attribute] - task2[attribute];
-}
-
-// /tasks/sort-by-priority
-app.get('/tasks/sort-by-priority', (req, res) => {
-  let sortedTasks = tasks.sort((task1, task2) =>
-    sortTasks('priority', task1, task2)
+function createUserObject(username) {
+  const check_user_existance = instagramUsers.find(
+    (user) => user.username === username
   );
-  res.json({ tasks: sortedTasks });
+  new_user = undefined;
+  if (check_user_existance === undefined) {
+    new_user = { id: instagramUsers.length + 1, username: username };
+  }
+  return new_user;
+}
+
+// POST new user --> /users/?username=khairajani
+app.post('/users', (req, res) => {
+  let username = req.query.username;
+  let newUser = createUserObject(username);
+  if (newUser === undefined) {
+    res.status(400).json({ message: `username '${username}' not available` });
+  } else {
+    instagramUsers.push(newUser);
+    res.status(201).json({ 'User added successfully': newUser });
+  }
 });
 
-function taskUpdate(tasksList, taskId, priority, text) {
-  for (let i = 0; i < tasksList.length; i++) {
-    if (tasksList[i]['taskId'] == taskId) {
-      // if priority is -1, updating the text
-      if (priority == -1) {
-        tasksList[i]['text'] = text;
-        // else, updating the priority
-      } else {
-        tasksList[i]['priority'] = priority;
-      }
+function updateUser(userID, bio, account_type) {
+  user_to_update = undefined;
+  for (let i = 0; i < instagramUsers.length; i++) {
+    if (instagramUsers[i]['id'] === userID) {
+      user_to_update = instagramUsers[i];
+      instagramUsers.splice(i, 1);
+      console.log('Gotcha');
+      break;
     }
   }
-  return tasksList;
-}
-
-// /tasks/edit-priority?taskId=1&priority=101
-app.get('/tasks/edit-priority', (req, res) => {
-  let taskId = parseInt(req.query.taskId);
-  let priority = parseInt(req.query.priority);
-  let newTaskList = taskUpdate(tasks.slice(), taskId, priority, 'None');
-  res.json({ tasks: newTaskList });
-});
-
-// /tasks/edit-text?taskId=1&text=himanshu+khairajani
-app.get('/tasks/edit-text', (req, res) => {
-  let taskId = parseInt(req.query.taskId);
-  let text = req.query.text;
-  let newTaskList = taskUpdate(tasks.slice(), taskId, -1, text);
-  res.json({ tasks: newTaskList });
-});
-
-function filterTask(taskElement, attribute, taskId, type = 'keep') {
-  if (type == 'keep') {
-    return taskElement[attribute] == taskId;
-  } else if (type == 'delete') {
-    return taskElement[attribute] != taskId;
+  if (user_to_update !== undefined) {
+    user_to_update['bio'] = bio;
+    user_to_update['account_type'] = account_type;
+    console.log('updating user..');
   }
+  return user_to_update;
 }
-// /tasks/delete?taskId=1
-app.get('/tasks/delete', (req, res) => {
-  let taskId = parseInt(req.query.taskId);
-  let newTaskList = tasks.filter((task) =>
-    filterTask(task, 'taskId', taskId, 'delete')
-  );
-  res.json({ tasks: newTaskList });
-});
 
-// /tasks/filter-by-priority?priority=1
-app.get('/tasks/filter-by-priority', (req, res) => {
-  let priority = parseInt(req.query.priority);
-  let newTaskList = tasks.filter((task) =>
-    filterTask(task, 'priority', priority, 'keep')
-  );
-  res.json({ tasks: newTaskList });
-});
-
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+// PUT update existing user --> /users/11?bio=Code%20n%20Cure&account_type=coding
+app.put('/users/:id', (req, res) => {
+  let id = parseInt(req.params.id);
+  let bio = req.query.bio;
+  let account = req.query.account_type;
+  let updatedUser = updateUser(id, bio, account);
+  if (updatedUser === undefined) {
+    res.status(400).json({ message: `User with ID ${id} not found` });
+  } else {
+    instagramUsers.push(updatedUser);
+    res.status(200).json({ 'User updated successfully': updatedUser });
+  }
 });
