@@ -8,7 +8,7 @@ let PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-app.listen(port, () => {
+app.listen(PORT, () => {
   console.log('Listening at 3000');
 });
 
