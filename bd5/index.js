@@ -138,7 +138,9 @@ function createUserObject(username) {
 
 // POST new user --> /users/?username=khairajani
 app.post('/users', (req, res) => {
-  let username = req.query.username;
+  // let username = req.query.username;
+  console.log(req.body);
+  const username = req.body.username;
   let newUser = createUserObject(username);
   if (newUser === undefined) {
     res.status(400).json({ message: `username '${username}' not available` });
@@ -169,8 +171,9 @@ function updateUser(userID, bio, account_type) {
 // PUT update existing user --> /users/11?bio=Code%20n%20Cure&account_type=coding
 app.put('/users/:id', (req, res) => {
   let id = parseInt(req.params.id);
-  let bio = req.query.bio;
-  let account = req.query.account_type;
+  console.log(req.body);
+  const bio = req.body.bio;
+  const account = req.body.account_type;
   let updatedUser = updateUser(id, bio, account);
   if (updatedUser === undefined) {
     res.status(400).json({ message: `User with ID ${id} not found` });
