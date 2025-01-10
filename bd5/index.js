@@ -3,9 +3,10 @@ const { resolve } = require('path');
 const cors = require('cors');
 const { DefaultSerializer } = require('v8');
 
-const app = express();
+let app = express();
+let PORT = process.env.PORT || 3000;
 app.use(cors());
-const port = 3000;
+app.use(express.json());
 
 app.listen(port, () => {
   console.log('Listening at 3000');
