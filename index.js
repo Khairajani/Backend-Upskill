@@ -104,7 +104,7 @@ const instagramUsers = [
 console.log(instagramUsers);
 
 // GET all users --> /users
-app.get('/users', (req, res) => {
+app.get('api/v1.0/users', (req, res) => {
   res.status(200).json({ users: instagramUsers });
 
   // Cutshort for Brainy Reasons
@@ -112,7 +112,7 @@ app.get('/users', (req, res) => {
 });
 
 // GET user details by id --> /users/1
-app.get('/users/:id', (req, res) => {
+app.get('api/v1.0/users/:id', (req, res) => {
   let id = parseInt(req.params.id);
   const user = instagramUsers.find((user) => user.id === id);
   if (user === undefined) {
@@ -137,7 +137,7 @@ function createUserObject(username) {
 }
 
 // POST new user --> /users/?username=khairajani
-app.post('/users', (req, res) => {
+app.post('api/v1.0/users', (req, res) => {
   // let username = req.query.username;
   console.log(req.body);
   const username = req.body.username;
@@ -170,7 +170,7 @@ function updateUser(userID, bio, account_type) {
 }
 
 // PUT update existing user --> /users/11?bio=Code%20n%20Cure&account_type=coding
-app.put('/users/:id', (req, res) => {
+app.put('api/v1.0/users/:id', (req, res) => {
   let id = parseInt(req.params.id);
   console.log(req.body);
   const bio = req.body.bio;
