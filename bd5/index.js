@@ -152,7 +152,8 @@ app.post('/users', (req, res) => {
 
 function updateUser(userID, bio, account_type) {
   user_to_update = undefined;
-  for (let i = 0; i < instagramUsers.length; i++) {
+  users_length = instagramUsers.length;
+  for (let i = 0; i < users_length; i++) {
     if (instagramUsers[i]['id'] === userID) {
       user_to_update = instagramUsers[i];
       instagramUsers.splice(i, 1);
