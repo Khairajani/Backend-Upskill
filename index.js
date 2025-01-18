@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
   res.status(200).send('Backend Fundamentals 5 - Assignment');
 });
 
-// ======================= BD5 : HW_2 =======================
+// ======================= BF5 : HW_2 =======================
 
 const instagramUsers = [
   {
