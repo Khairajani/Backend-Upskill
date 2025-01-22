@@ -12,11 +12,13 @@ const app = express();
 app.use(express.json());
 const port = 3000;
 
+//  /
 app.get("/", (req, res) => {
   res.send("Employee Management System Home Page");
 });
 
-// Endpoint to seed database
+// /seed_db : Endpoint to seed database
+
 app.get("/seed_db", async (req, res) => {
   await sequelize.sync({ force: true });
 
@@ -155,6 +157,7 @@ async function fetchEmployees(id, sort_attribute, sort_type) {
   return result;
 }
 
+// /employees : Endpoint to fetch all employees
 app.get("/employees", async (req, res) => {
   try {
     let response = await fetchEmployees();
@@ -171,6 +174,7 @@ app.get("/employees", async (req, res) => {
   }
 });
 
+// /employees/2 : Endpoint to fetch employee details
 app.get("/employees/details/:id", async (req, res) => {
   try {
     let id = parseInt(req.params.id);
@@ -200,6 +204,7 @@ async function getDepartmentEmployees(departmentId) {
   return { employees: employeesDetails };
 }
 
+// /emloyees/department/2 : Endpoint to fetch employees of a department
 app.get("/employees/department/:id", async (req, res) => {
   try {
     let id = parseInt(req.params.id);
@@ -229,6 +234,7 @@ async function getRoleEmployees(roleId) {
   return { employees: employeesDetails };
 }
 
+// /employees/role/2 : Endpoint to fetch employees of a role
 app.get("/employees/role/:id", async (req, res) => {
   try {
     let id = parseInt(req.params.id);
@@ -246,6 +252,7 @@ app.get("/employees/role/:id", async (req, res) => {
   }
 });
 
+// /employees/sort-by-name?order=asc : Endpoint to fetch employees sorted by name
 app.get("/employees/sort-by-name", async (req, res) => {
   try {
     let sort_type = req.query.order;
@@ -260,6 +267,122 @@ app.get("/employees/sort-by-name", async (req, res) => {
     res
       .status(500)
       .json({ message: "Error fetching employees", error: error.message });
+  }
+});
+
+async function addEmployee(newEmployeeData, departmentId, roleId) {
+  let employeeData = await employee.create({
+    name: newEmployeeData.name,
+    email: newEmployeeData.email,
+  });
+  let employeeId = employeeData.id;
+  await employeeDepartment.create({
+    employeeId,
+    departmentId,
+  });
+  await employeeRole.create({
+    employeeId,
+    roleId,
+  });
+  let employeeDetails = await getEmployeeDetails(employeeData);
+  return employeeDetails;
+}
+
+// /employees/new : Endpoint to create a new employee
+app.post("/employees/new", async (req, res) => {
+  try {
+    let req_body = req.body;
+    let newEmployeeData = { name: req_body.name, email: req_body.email };
+    let departmentId = req_body.departmentId;
+    let roleId = req_body.roleId;
+    let response = await addEmployee(newEmployeeData, departmentId, roleId);
+    console.log(response);
+    return res.status(201).json(response);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error creating employee", error: error.message });
+  }
+});
+
+async function updateEmployee(id, name, email, departmentId, roleId) {
+  let employeeData = await employee.findOne({ where: { id } });
+  if (employeeData === null) {
+    return { employee: null, message: `No employee found by ID ${id}` };
+  }
+  if (
+    name === undefined &&
+    email === undefined &&
+    departmentId === undefined &&
+    roleId === undefined
+  ) {
+    return { employee: null, message: "No changes made" };
+  }
+  let employeeId = employeeData.id;
+
+  // if department of employee is changed, then delete the old department and create new one
+  if (departmentId) {
+    await employeeDepartment.destroy({
+      where: {
+        employeeId,
+      },
+    });
+    await employeeDepartment.create({
+      employeeId,
+      departmentId,
+    });
+  }
+
+  // if role of employee is changed, then delete the old role and create a new one
+  if (roleId) {
+    await employeeRole.destroy({
+      where: {
+        employeeId,
+      },
+    });
+    await employeeRole.create({
+      employeeId,
+      roleId,
+    });
+  }
+
+  // if name or email of employee is changed, then update the employee using set
+  let updateMap = undefined;
+  if (name) {
+    updateMap = { name };
+  } else if (email) {
+    updateMap = { email };
+  }
+
+  if (updateMap) {
+    employeeData.set(updateMap);
+    await employeeData.save();
+  }
+  let employeeDetails = await getEmployeeDetails(employeeData);
+  return { employee: employeeDetails };
+}
+
+// /employees/update/8 : Endpoint to create a new employee
+app.post("/employees/update/:id", async (req, res) => {
+  try {
+    let id = req.params.id;
+    let req_body = req.body;
+    let response = await updateEmployee(
+      id,
+      req_body.name,
+      req_body.email,
+      req_body.departmentId,
+      req_body.roleId,
+    );
+    console.log(response);
+    if (response.employee === null) {
+      return res.status(404).json({ message: response.message });
+    }
+    return res.status(201).json(response.employee);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error updating employee", error: error.message });
   }
 });
 
