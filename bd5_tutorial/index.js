@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());
 const port = 3000;
 
-// ======================= Tutorial: BD1.1 =======================
+// ======================= Tutorial: BD5 =======================
 // start node app: node index.js
 // base GET code
 // function for home page (round implemented in beginning)

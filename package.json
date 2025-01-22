@@ -2,7 +2,7 @@
   "name": "express-simple-starter",
   "private": true,
   "scripts": {
-    "start": "node bd5_tutorial/index.js"
+    "start": "node bd5/index.js"
   },
   "type": "module",
   "dependencies": {
