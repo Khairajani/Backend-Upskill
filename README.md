@@ -4,7 +4,7 @@ Welcome to my backend upskill repository.
 We are currently focusing on learning backend development via APIs in Express.js.
 
 
-## 📘 API Endpoints
+## 📘 Codebase directories
 
 ### 1. **bd1/bd1.js**
 **Topic**: `FlipDeal`
