@@ -111,7 +111,7 @@ The backend includes helper functions and endpoints to manage employee records, 
 
 - **Backend**: RESTful API build in Express.js
 - **Programming Language**: JavaScript
-- **Database**: NA
+- **Database**: sqlite
 
 ---
 
