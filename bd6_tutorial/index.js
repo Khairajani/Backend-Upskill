@@ -127,14 +127,28 @@ app.get("/users/:id", async (req, res) => {
   }
 });
 
+// Tutorial BD6.5
+async function validateUser(user){
+  if(!user.name || typeof user.name !=="string"){
+    return "'name' field is required in 'string' format"
+  }
+  if (!user.email || typeof user.email !=="string"){
+    return "'email' field is required in 'string' format"
+  } 
+}
+
 // 2. Add a new user
 app.post("/users", async (req, res) => {
   const { name, email } = req.body;
-  if (!name || !email) {
-    return res
-      .status(400)
-      .json({ message: "Missing required fields: name, email" });
-  }
+  // if (!name || !email) {
+  //   return res
+  //     .status(400)
+  //     .json({ message: "Missing required fields: name, email" });
+  // }
+
+  // Tutorial BD6.5 - validation testing
+  let error = await validateUser(req.body)
+  if(error) return res.status(400).json({message: error})
   const newUser = { name, email };
   const addedUser = await addUser(newUser);
   res.status(201).json(addedUser);
