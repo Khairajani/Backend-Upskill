@@ -1,8 +1,9 @@
 {
   "version": 2,
-  "builds": [{ "src": "bd6_tutorial/server.js", "use": "@vercel/node","env": {
+  "builds": [{ "src": "bd6_tutorial/server.js", "use": "@vercel/node"}],
+  "env": {
     "PYTHON_VERSION": "3.9"
-  }}],
+  },
   "rewrites": [{ "source": "/(.*)", "destination": "bd6_tutorial/server.js" }],
   "installCommand": "rm -rf node_modules && npm install --force"
 }
