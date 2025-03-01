@@ -135,6 +135,7 @@ async function validateUser(user){
   if (!user.email || typeof user.email !=="string"){
     return "'email' field is required in 'string' format"
   } 
+  return null
 }
 
 // 2. Add a new user
@@ -157,4 +158,4 @@ app.post("/users", async (req, res) => {
 // ======================= Tutorial: BD6.4 =======================
 // Review APIs
 
-module.exports = { app };
+module.exports = { app, validateUser };

@@ -8,7 +8,7 @@ const {
 } = require("../review.js");
 
 const { getBooks, getBook, addBook } = require("../book.js");
-const { app } = require("../index.js");
+const { app, validateUser } = require("../index.js");
 const http = require("http");
 const { deserialize } = require("v8");
 
@@ -25,13 +25,14 @@ jest.mock("../review.js", () => ({
   addReview: jest.fn(),
   getUserByID: jest.fn(),
   addUser: jest.fn(),
+  users: jest.fn(),
 }));
-
+ 
 let server;
 
 beforeAll((done) => {
   server = http.createServer(app);
-  server.listen(3001, done);
+  server.listen(3002, done);
 });
 
 afterAll((done) => {
@@ -121,5 +122,49 @@ describe("API Endpoints BD6.4: Error handling", () => {
     expect(response.body.error).toBe(
       "The book with the given ID was not found.",
     );
+  });
+});
+
+
+describe("API Endpoints BD6.5 Validation",()=>{
+  beforeEach(()=>{
+    jest.clearAllMocks()
+  });
+
+  it("/users should add a user if given a valid input",async ()=>{
+    const mockUser = {"id":1,"name":"test1name", "email":"test1@email.com"}
+    addUser.mockResolvedValue(mockUser);
+
+    const res = await request(server).post("/users").send({
+      "name":"test1name", "email":"test1@email.com"
+    })
+
+    expect(res.statusCode).toEqual(201);
+    expect(res.body).toEqual({
+      "id":1,"name":"test1name", "email":"test1@email.com"
+    });
+  });
+
+  it("/users should return 400 if given an invalid input",async ()=>{
+    const res = await request(server).post("/users").send({
+      "name":1, "email":"test1@email.com"
+    })
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body.message).toEqual("'name' field is required in 'string' format");
+  });
+
+})
+
+describe("Validation Functions",()=>{
+  it("should validate user input correctly for valid input",async ()=>{
+    const returnValue = await validateUser({name:"john", email:"johnemail@gmail.com"})
+    console.log(returnValue)
+    expect(returnValue).toBeNull();
+  });
+
+  it("should validate user input correctly for invalid input",async ()=>{
+    const returnValue = await validateUser({email:"johnemail@gmail.com"})
+    expect(returnValue).toEqual("'name' field is required in 'string' format");
   });
 });

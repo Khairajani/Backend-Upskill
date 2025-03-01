@@ -47,5 +47,5 @@ module.exports = {
   getReviewByID,
   addReview,
   getUserByID,
-  addUser,
+  addUser
 };
