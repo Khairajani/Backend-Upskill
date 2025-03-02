@@ -34,10 +34,11 @@ app.get("/stocks/:ticker",async (req, res)=>{
 })
 
 async function validateTrade(trade){
-  if(!trade.stockId || typeof trade.stockId !=="integer"){
+  console.log(typeof trade.stockId)
+  if(!trade.stockId || !Number.isInteger(trade.stockId)){
     return "'stockId' field is required in 'integer' format"
   }
-  if(!trade.quantity || typeof trade.quantity !=="integer"){
+  if(!trade.quantity || !Number.isInteger(trade.quantity)){
     return "'quantity' field is required in 'integer' format"
   }
   if (!trade.tradeType || typeof user.tradeType !=="string"){
