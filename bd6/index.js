@@ -45,7 +45,7 @@ async function validateTrade(trade){
   (trade.tradeType.toLowerCase() !== "buy" && trade.tradeType.toLowerCase() !== "sell")) {
 return "'tradeType' field is required in 'string' format and must be either 'buy' or 'sell'"
   }
-  
+
   if (!trade.tradeDate || typeof trade.tradeDate !=="string"){
     return "'tradeDate' field is required in 'string' format"
   }
@@ -56,7 +56,7 @@ app.post("/trades/new", async (req, res) => {
   let error = await validateTrade(req.body)
   if(error) return res.status(400).json({message: error})
   const addedTrade = await addTrade(req.body);
-  res.status(201).json(addedTrade);
+  res.status(201).json({trade:addedTrade});
 });
 
 module.exports = { app, validateTrade };
