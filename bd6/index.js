@@ -41,10 +41,12 @@ async function validateTrade(trade){
   if(!trade.quantity || !Number.isInteger(trade.quantity)){
     return "'quantity' field is required in 'integer' format"
   }
-  if (!trade.tradeType || typeof user.tradeType !=="string"){
-    return "'tradeType' field is required in 'string' format"
+  if (!trade.tradeType || typeof trade.tradeType !== "string" || 
+  (trade.tradeType.toLowerCase() !== "buy" && trade.tradeType.toLowerCase() !== "sell")) {
+return "'tradeType' field is required in 'string' format and must be either 'buy' or 'sell'"
   }
-  if (!trade.tradeDate || typeof user.tradeDate !=="string"){
+  
+  if (!trade.tradeDate || typeof trade.tradeDate !=="string"){
     return "'tradeDate' field is required in 'string' format"
   }
   return null
