@@ -2,7 +2,7 @@
   "name": "express-simple-starter",
   "private": true,
   "scripts": {
-    "start": "node bd6_tutorial/server.js",
+    "start": "node bd6/server.js",
     "test": "jest"
   },
   "type": "commonjs",
