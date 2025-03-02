@@ -12,6 +12,7 @@ let {
   getUserByID,
   addUser,
 } = require("./review.js");
+let {getEmployees} = require("./controller")
 
 app.get("/", (req, res) => {
   res.send("Hello World! BD6 Tutorial");
@@ -157,5 +158,28 @@ app.post("/users", async (req, res) => {
 
 // ======================= Tutorial: BD6.4 =======================
 // Review APIs
+
+// ======================= Tutorial: BD6.6 =======================
+// Employees APIs
+app.get("/employees",async (req, res)=>{
+  try{
+    let employees = await getEmployees()
+    if(!employees) return res.status(404).json({"message":"No employees found"})
+    else return res.status(200).json({"employees":employees})
+  } catch(error){
+    res.status(500).json({"message":`something went wrong${error}`})
+  }
+})
+
+app.get("/employees/:id",async (req, res)=>{
+  try{
+    let id = parseInt(req.params.id)
+    let employee = await getEmployees(id)
+    if(!employee) return res.status(404).json({"message":`No employee found with ID ${id}`})
+    else return res.status(200).json({"employee":employee})
+  } catch(error){
+    res.status(500).json({"message":`something went wrong${error}`})
+  }
+})
 
 module.exports = { app, validateUser };
