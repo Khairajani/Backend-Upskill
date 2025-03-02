@@ -14,5 +14,5 @@ async function getStocks(ticker) {
 }
 
 module.exports = {
-  getStocks,
+  getStocks, stocks
 };

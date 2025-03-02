@@ -59,4 +59,4 @@ app.post("/trades/new", async (req, res) => {
   res.status(201).json({trade:addedTrade});
 });
 
-module.exports = { app, validateTrade };
+module.exports = { app };
